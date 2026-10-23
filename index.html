@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Security Scanner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <div class="eyebrow">CYBERSECURITY • STUDENT PROJECT</div>
+      <h1>Automated Web Security Scanner</h1>
+      <p>Check common website security headers and review basic CORS configuration.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Start a scan</h2>
+      <p class="muted">Only scan websites you own or have explicit permission to test.</p>
+      <form method="post">
+        <label for="url">Website URL</label>
+        <div class="formrow">
+          <input id="url" name="url" type="text" placeholder="https://example.com" required>
+          <button type="submit">Scan website</button>
+        </div>
+      </form>
+      {% if error %}
+        <div class="alert">{{ error }}</div>
+      {% endif %}
+    </section>
+
+    {% if report %}
+    <section class="summary">
+      <div class="stat"><span>HTTP status</span><strong>{{ report.status_code }}</strong></div>
+      <div class="stat"><span>Checks performed</span><strong>{{ report.checks|length }}</strong></div>
+      <div class="stat"><span>Scanned at</span><strong class="date">{{ report.scanned_at }}</strong></div>
+    </section>
+
+    <section class="panel">
+      <div class="report-head">
+        <div>
+          <h2>Scan results</h2>
+          <p class="muted target">{{ report.target }}</p>
+        </div>
+        <a class="download" href="{{ url_for('download_report') }}">Download CSV</a>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Check</th><th>Status</th><th>Details</th></tr></thead>
+          <tbody>
+          {% for check in report.checks %}
+            <tr>
+              <td class="checkname">{{ check.name }}</td>
+              <td><span class="badge {{ check.status|lower }}">{{ check.status }}</span></td>
+              <td>{{ check.details }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="notice">{{ report.note }}</p>
+    </section>
+    {% endif %}
+
+    <footer>
+      <strong>Educational use only.</strong> A missing header is not automatically a vulnerability; interpret each result in the context of the application.
+    </footer>
+  </main>
+</body>
+</html>
